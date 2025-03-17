@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="MySuite">
+    <test name="MyTest">
+        <classes>
+            <class name="Automation.launchApplication">
+                <methods>
+                    <include name="launchApplicationLogin"/>
+                    <include name="searchProduct"/>
+                    <include name="topDealsCheck"/>
+                    <include name="addProductsToCart"/>
+                    <include name="cartProcess"/>
+                    <include name="checkOutPage"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
