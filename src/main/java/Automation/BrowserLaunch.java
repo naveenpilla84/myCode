@@ -22,7 +22,7 @@ public abstract class BrowserLaunch {
         if (browser.equalsIgnoreCase("chrome")) {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-    }
+        }
         if (browser.equalsIgnoreCase("edge")) {
             WebDriverManager.edgedriver().setup();
             driver = new EdgeDriver();
@@ -30,8 +30,7 @@ public abstract class BrowserLaunch {
         if (browser.equalsIgnoreCase("firefox")){
             WebDriverManager.firefoxdriver().setup();
         driver = new FirefoxDriver();
-    }
-
+        }
         driver.manage().window().maximize();
     }
     public WebDriver getDriver() {

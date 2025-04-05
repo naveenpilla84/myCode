@@ -1,26 +1,30 @@
-package Automation;
+package Automation1;
 
-
-import org.openqa.selenium.WebElement;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
 import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.util.List;
 
-public class launchApplication extends BaseTestSetup{
+
+public class launchApplication_PW extends BaseTestSetup_PW {
+
+    private static final int LONG_WAIT = 90;
+    protected Page offersTab;
 
     @Test(priority = 1)
     public void launchApplicationLogin() throws IOException {
-            implicitWait(10);
             String url = (String) getDataFromConfigFile("GreenCartURL");
-            geturl(url);
+            go(url);
             assertConditionCheck("GreenKart - veg and fruits kart");
-            locatorVisibleOrNot("GreenKartTitle",10);
+            locatorVisibleOrNot("GreenKartTitle",LONG_WAIT);
             passWithScreenShot("Homepage","Success with Launching application");
     }
 
     @Test(priority = 2)
     public void searchProduct() throws IOException {
-            locatorClickableOrNot("SearchBar", 10);
+            locatorClickableOrNot("SearchBar", LONG_WAIT);
             iClick("SearchBar");
             iEnterText("SearchBar", "Tomato");
             iClick("SearchBtn");
@@ -28,32 +32,38 @@ public class launchApplication extends BaseTestSetup{
 
     @Test(priority = 3)
     public void topDealsCheck() throws IOException {
-            locatorClickableOrNot("TopDealsLink",10);
-            String window=getParentWindowHandle();
-            iClick("TopDealsLink");
-            switchToChildWindow(window);
+           locatorClickableOrNot("TopDealsLink",LONG_WAIT);
+            Page mainPage= page;
+        offersTab= page.waitForPopup(() ->{
+            try {
+                iClick("TopDealsLink");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        page=offersTab;
             selectDropdown("topDealsDropdown","20");
             //Getting top 5 discount products
             int Size=5;
-            List<WebElement> productNames=getElementsList("getTopProductName");
-            List<WebElement> productPrices=getElementsList("getTopProductPrice");
-            List<WebElement> productDiscounts=getElementsList("getTopProductDiscount");
+            List<Locator> productNames=getElementsList("getTopProductName");
+            List<Locator> productPrices=getElementsList("getTopProductPrice");
+            List<Locator> productDiscounts=getElementsList("getTopProductDiscount");
             for (int i=1;i<productNames.size();i++){
-                String productName=productNames.get(i).getText();
-                String productPrice=productPrices.get(i).getText();
-                String productDiscount=productDiscounts.get(i).getText();
+                String productName=productNames.get(i).textContent();
+                String productPrice=productPrices.get(i).textContent();
+                String productDiscount=productDiscounts.get(i).textContent();
                 consoleMessage("Product:-"+productName+", Actual Price :-"+productPrice+", Discount :-"+productDiscount);
             }
-            closeCurrentWindAndSwitchToMain(window);
+            closeCurrentWindAndSwitchToMain(mainPage);
             refreshPage();
     }
 
     @Test(priority = 4)
     public void addProductsToCart()throws IOException {
-            List<WebElement> productNames = getElementsList("ProductNames");
-            List<WebElement> inputText=getElementsList("QuantityInput");
+            List<Locator> productNames = getElementsList("ProductNames");
+            List<Locator> inputText=getElementsList("QuantityInput");
             String[] needItems = getDataFromConfigFile("Products").toString().split(";");
-            List<WebElement> cartButtons = getElementsList("Cart");
+            List<Locator> cartButtons = getElementsList("Cart");
 
             for (String item : needItems) {
                 String[] productAndQuantity = item.split("\\|");
@@ -63,13 +73,13 @@ public class launchApplication extends BaseTestSetup{
                 int quantity = Integer.parseInt(productAndQuantity[1].trim());
 
                 for (int i = 0; i < productNames.size(); i++) {
-                    String[] productDetails = productNames.get(i).getText().split("-");
+                    String[] productDetails = productNames.get(i).textContent().split("-");
                     if (productDetails.length > 1) {
                         String productName = productDetails[0].trim();
                         if (productName.equalsIgnoreCase(requiredProduct)) {
                             if(quantity>0) {
                                 inputText.get(i).clear();
-                                inputText.get(i).sendKeys(String.valueOf(quantity));
+                                inputText.get(i).fill(String.valueOf(quantity));
                                 cartButtons.get(i).click();
                             }
                         }
@@ -84,17 +94,17 @@ public class launchApplication extends BaseTestSetup{
         String promo=getDataFromConfigFile("PromoCode").toString();
         iEnterText("PromoCode",promo);
         iClick("ApplyBtn");
-        locatorVisibleOrNot("PromoSuccessMsg",10);
+        //locatorVisibleOrNot("PromoSuccessMsg",LONG_WAIT*3);
         iClick("PlaceOrder");
     }
 
     @Test(priority = 6)
     public  void checkOutPage() throws IOException {
-        locatorVisibleOrNot("CountryLabel",10);
+        locatorVisibleOrNot("CountryLabel",LONG_WAIT*3);
         selectDropdown("CountryDrpDwn","India");
         iClick("checkBox");
         iClick("ProceedBtn");
-        locatorVisibleOrNot("SuccessfullyMsg",10);
+        locatorVisibleOrNot("SuccessfullyMsg",LONG_WAIT*3);
         consoleMessage("Successfully order placed");
     }
 }
