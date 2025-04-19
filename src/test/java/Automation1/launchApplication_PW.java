@@ -100,6 +100,7 @@ public class launchApplication_PW extends BaseTestSetup_PW {
 
     @Test(priority = 6)
     public  void checkOutPage() throws IOException {
+        log.info("Starting checkout process");
         locatorVisibleOrNot("CountryLabel",LONG_WAIT*3);
         selectDropdown("CountryDrpDwn","India");
         iClick("checkBox");
